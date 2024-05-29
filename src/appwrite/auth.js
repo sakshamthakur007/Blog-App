@@ -1,56 +1,67 @@
-import conf from "../conf/conf";
+import conf from '../conf/conf.js';
 import { Client, Account, ID } from "appwrite";
 
 export class AuthService {
-    client=new Client();
+    client = new Client();
     account;
-    constructor(){
+
+    constructor() {
         this.client
             .setEndpoint(conf.appwriteurl)
             .setProject(conf.appwriteProjectId);
-        this.account=new Account(this.client);
+        this.account = new Account(this.client);
     }
 
-    async createAccount({email,password,name}){
+    async createAccount({ email, password, name }) {
         try {
-           const userAccount= await this.account.create(ID.unique(),email,password,name);
-           if(userAccount){
-            // call another method
-                return this.login({email,password});
-           }
-           else {
-             return userAccount
-           }
+            console.log('Creating account with email:', email);
+            const userAccount = await this.account.create(ID.unique(), email, password, name);
+            if (userAccount) {
+                console.log('Account created:', userAccount);
+                return this.login({ email, password });
+            } else {
+                return userAccount;
+            }
         } catch (error) {
+            console.error('Error creating account:', error);
             throw error;
         }
-    }
-    async login({email,password}){
-        try {
-           return await this.account.createEmailPasswordSession(email,password);
-        } catch (error) {
-            throw error;
-        }
-    }
-    async getCurrentUser(){
-        try {
-           return await this.account.get();
-        } catch (error) {
-            throw error;
-        }
-        return null;
     }
 
-    async logout(){
+    async login({ email, password }) {
         try {
+            console.log('Attempting to log in with email:', email);
+            const session = await this.account.createEmailPasswordSession(email, password);
+            console.log('Logged in successfully:', session);
+            return session;
+        } catch (error) {
+            console.error('Login failed:', error);
+            throw error;
+        }
+    }
+
+    async getCurrentUser() {
+        try {
+            console.log('Fetching current user');
+            const user = await this.account.get();
+            console.log('Current user:', user);
+            return user;
+        } catch (error) {
+            console.error('Error getting current user:', error);
+            throw error;
+        }
+    }
+
+    async logout() {
+        try {
+            console.log('Attempting to log out');
             await this.account.deleteSessions();
+            console.log('Logged out successfully');
         } catch (error) {
-            throw error;
+            console.error('Logout failed:', error);
         }
     }
 }
 
 const authService = new AuthService();
-
-export default authService
-
+export default authService;

@@ -1,9 +1,9 @@
 import React from 'react'
-import { Login as Logincomponent } from '../Components'
+import { Login as loginComponent} from '../Components'
 function Login() {
   return (
     <div className='py-8'>
-      <Logincomponent/>
+      <loginComponent/>
     </div>
   )
 }
